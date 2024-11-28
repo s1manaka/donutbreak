@@ -84,14 +84,37 @@ function createBlocks() {
     return blocksArray;
 }
 
-// 衝突判定（ボールと矩形）
-function isColliding(ball, rect) {
-    const closestX = Math.max(rect.x, Math.min(ball.x, rect.x + rect.width));
-    const closestY = Math.max(rect.y, Math.min(ball.y, rect.y + rect.height));
-    const distanceX = ball.x - closestX;
-    const distanceY = ball.y - closestY;
-    return distanceX * distanceX + distanceY * distanceY < ball.radius * ball.radius;
+// スワイプ専用のパドル移動
+function movePaddleBySwipe(distance) {
+    // スワイプ距離に基づいてパドルを移動
+    paddle.x += distance;
+
+    // 画面外に出ないように位置を制限
+    if (paddle.x < 0) paddle.x = 0;
+    if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+
+    // スワイプ方向で画像を変更
+    paddle.img.src = distance > 0 ? "kanou4.png" : "kanou.png"; // 右スワイプならkanou4.png、左スワイプならkanou.png
 }
+
+// タッチイベント（スワイプ操作用）
+canvas.addEventListener('touchstart', (event) => {
+    // スワイプ開始位置を記録
+    swipeStartX = event.touches[0].clientX;
+});
+
+canvas.addEventListener('touchend', (event) => {
+    // スワイプ終了位置を取得
+    const swipeEndX = event.changedTouches[0].clientX;
+
+    // スワイプ距離を計算
+    swipeDistance = swipeEndX - swipeStartX;
+
+    // スワイプ距離が一定以上の場合にのみパドルを移動
+    if (Math.abs(swipeDistance) > 30) { // 30px以上のスワイプのみ反応
+        movePaddleBySwipe(swipeDistance);
+    }
+});
 
 // ゲームの描画処理
 function drawGame() {
