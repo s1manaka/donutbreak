@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             width: 100,
             height: 80,
             img: new Image(),
-            speed: 6,
+            speed: 12, // パドルの移動速度を加速
         };
         paddle.img.src = "kanou.png"; // 初期のパドル画像
 
@@ -123,12 +123,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // パドルを滑らかに移動させる
     function smoothMovePaddle() {
         // 現在の位置から目標位置に向かってスムーズに移動
-        const moveSpeed = 0.1; // 移動速度（0.0〜1.0の範囲で調整）
+        const moveSpeed = 0.5; // 移動速度を加速
         paddle.x += (paddleTargetX - paddle.x) * moveSpeed;
 
         // 画面外に出ないように制限
         if (paddle.x < 0) paddle.x = 0;
         if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+    }
+
+    // ボールの更新処理
+    function updateBalls() {
+        balls.forEach((ball) => {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // ボールが壁に当たったときの処理
+            if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+                ball.dx = -ball.dx;
+            }
+            if (ball.y - ball.radius < 0) {
+                ball.dy = -ball.dy;
+            }
+
+            // ボールがパドルに当たったときの処理
+            if (
+                ball.y + ball.radius > paddle.y &&
+                ball.x > paddle.x &&
+                ball.x < paddle.x + paddle.width
+            ) {
+                ball.dy = -ball.dy;
+            }
+        });
     }
 
     // ゲームの描画処理
@@ -159,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ゲーム更新
     function updateGame() {
         smoothMovePaddle(); // パドルの位置を滑らかに更新
+        updateBalls(); // ボールの位置を更新
     }
 
     // ゲーム終了
@@ -184,14 +210,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateGame();
         drawGame();
-        requestAnimationFrame(gameLoop);
+
+        requestAnimationFrame(gameLoop); // ゲームの更新を繰り返す
     }
 
     // ゲーム開始
     playButton.addEventListener('click', () => {
         titleScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
-        initGame(); // ゲーム開始時に必ず初期化
+        initGame();
         gameLoop();
     });
 
@@ -199,18 +226,17 @@ document.addEventListener('DOMContentLoaded', () => {
     retryButton.addEventListener('click', () => {
         gameOverScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
-        initGame(); // リトライ時にも必ず初期化
+        initGame();
         gameLoop();
     });
 
     retryButtonClear.addEventListener('click', () => {
         gameClearScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
-        initGame(); // ゲームクリア後も必ず初期化
+        initGame();
         gameLoop();
     });
 
-    // タイトルに戻る
     titleButton.addEventListener('click', () => {
         gameOverScreen.classList.add('hidden');
         gameClearScreen.classList.add('hidden');
