@@ -1,0 +1,78 @@
+/* 全体共通 */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    background-color: #4ea7a3; /* 背景色 */
+}
+
+/* スクリーン全体をカバー */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 背景画像 */
+.background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+/* ボタン */
+.styled-button {
+    background-color: white;
+    color: #2683bd;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+    box-shadow: 0 4px #16a6a8;
+    transition: transform 0.2s, background-color 0.2s;
+    margin-top: 10px;
+}
+
+.styled-button:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px #b2ebe6;
+}
+
+.styled-button:hover {
+    background-color: #b2ebe6;
+}
+
+/* タイトル画面のボタン */
+#play-button {
+    position: absolute;
+    bottom: 10%;
+}
+
+/* ゲームキャンバス */
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+}
+
+/* ゲームオーバー＆クリア画面 */
+#game-over-img, #game-clear-img {
+    max-width: 50%;
+    margin-bottom: 20px;
+}
