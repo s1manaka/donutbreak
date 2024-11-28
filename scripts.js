@@ -181,19 +181,6 @@ function drawGame() {
     });
 }
 
-// パドルをスワイプで動かす関数
-function movePaddleBySwipe(distance) {
-    // スワイプ距離に応じてパドルの位置を移動
-    paddle.x += distance;
-
-    // 画面外にパドルが出ないように制限
-    if (paddle.x < 0) paddle.x = 0;
-    if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
-
-    // スワイプ方向に応じた画像を設定
-    paddle.img.src = distance > 0 ? "kanou4.png" : "kanou.png"; // 右スワイプならkanou4.png、左スワイプならkanou.png
-}
-
 // タッチイベントの設定
 canvas.addEventListener('touchstart', (event) => {
     // 最初のタッチ位置を記録
