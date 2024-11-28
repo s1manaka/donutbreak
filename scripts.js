@@ -84,6 +84,27 @@ function createBlocks() {
     return blocksArray;
 }
 
+// 衝突チェック関数を改善（ボールが画面端で止まる問題の修正）
+function updateBallDirection(ball) {
+    // 小さなランダム値を加え、完全な直線移動を防ぐ
+    ball.dx += (Math.random() - 0.5) * 0.1;
+    ball.dy += (Math.random() - 0.5) * 0.1;
+
+    // ボール速度の再正規化
+    const speed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2);
+    ball.dx = (ball.dx / speed) * ballSpeed;
+    ball.dy = (ball.dy / speed) * ballSpeed;
+}
+// 衝突判定（ボールと矩形）
+function isColliding(ball, rect) {
+    const closestX = Math.max(rect.x, Math.min(ball.x, rect.x + rect.width));
+    const closestY = Math.max(rect.y, Math.min(ball.y, rect.y + rect.height));
+    const distanceX = ball.x - closestX;
+    const distanceY = ball.y - closestY;
+    return distanceX * distanceX + distanceY * distanceY < ball.radius * ball.radius;
+}
+
+
 // スワイプ専用のパドル移動
 function movePaddleBySwipe(distance) {
     // スワイプ距離に基づいてパドルを移動
@@ -184,3 +205,138 @@ canvas.addEventListener('mousemove', (event) => {
     paddle.img.src = mouseX > paddleLastX ? "kanou4.png" : "kanou.png";
     paddleLastX = mouseX;
 });
+
+// ゲーム更新
+function updateGame() {
+    balls.forEach((ball) => {
+        // ボールの移動
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+
+        // 壁との衝突
+        if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
+            ball.dx *= -1;
+            updateBallDirection(ball);
+        }
+        if (ball.y < ball.radius) {
+            ball.dy *= -1;
+            updateBallDirection(ball);
+        }
+
+        // パドルとの衝突判定
+        if (
+            ball.y + ball.radius > paddle.y &&
+            ball.x > paddle.x &&
+            ball.x < paddle.x + paddle.width
+        ) {
+            const hitPosition = (ball.x - paddle.x) / paddle.width; // 0~1の範囲で衝突位置を計算
+            const angle = (hitPosition - 0.5) * Math.PI / 2; // 反射角を計算
+            const speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy); // ボール速度を一定に
+
+            ball.dx = speed * Math.sin(angle);
+            ball.dy = -speed * Math.cos(angle);
+        }
+
+
+// ブロックとの衝突判定部分を修正
+	blocks.forEach((block) => {
+  　　  if (!block.hit && isColliding(ball, block)) {
+        block.hit = true;
+        ball.dy *= -1;
+        updateBallDirection(ball);
+
+        // ブロックの半数が壊れた時にボールを1回だけ追加
+        if (
+            !ballAddedOnce && // まだボールが追加されていない
+            blocks.filter((b) => b.hit).length > blocks.length / 2
+        ) {
+            balls.push({
+                x: canvas.width / 2,
+                y: canvas.height - 60,
+                dx: ballSpeed,
+                dy: -ballSpeed,
+                radius: 10,
+                img: new Image(),
+            });
+            balls[balls.length - 1].img.src = "boll2.png"; // 追加ボール画像
+            ballAddedOnce = true; // ボール追加フラグを立てる
+        }
+    }
+});
+
+        // ボールが画面外に出た場合
+        if (ball.y > canvas.height) {
+            balls.splice(balls.indexOf(ball), 1);
+            if (balls.length === 0) endGame(false);
+        }
+    });
+
+    // すべてのブロックが壊れた場合
+    if (blocks.every((block) => block.hit)) {
+        endGame(true);
+    }
+}
+
+// ゲーム終了
+function endGame(isWin) {
+    gameRunning = false;
+    gameOverImg.src = "";
+    gameClearImg.src = "";
+
+    if (isWin) {
+        gameClearImg.src = "gamekuria.png";
+        gameScreen.classList.add('hidden');
+        gameClearScreen.classList.remove('hidden');
+    } else {
+        gameOverImg.src = "gameover.png";
+        gameScreen.classList.add('hidden');
+        gameOverScreen.classList.remove('hidden');
+    }
+}
+
+// ゲームループ
+function gameLoop() {
+    if (!gameRunning) return;
+
+    updateGame();
+    drawGame();
+    requestAnimationFrame(gameLoop);
+}
+
+// タイトル画面に戻る
+function backToTitle() {
+    gameScreen.classList.add('hidden');
+    gameOverScreen.classList.add('hidden');
+    gameClearScreen.classList.add('hidden');
+    titleScreen.classList.remove('hidden');
+}
+
+// プレイボタンの動作
+playButton.addEventListener('click', () => {
+    titleScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    initGame();
+    requestAnimationFrame(gameLoop);
+});
+
+// リトライボタンの動作（ゲームオーバー画面）
+retryButton.addEventListener('click', () => {
+    gameOverScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    initGame();
+    requestAnimationFrame(gameLoop);
+});
+
+// リトライボタンの動作（ゲームクリア画面）
+retryButtonClear.addEventListener('click', () => {
+    gameClearScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    initGame();
+    requestAnimationFrame(gameLoop);
+});
+
+// タイトルボタン
+titleButton.addEventListener('click', backToTitle);
+titleButtonClear.addEventListener('click', backToTitle);
+
+
