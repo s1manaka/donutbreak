@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ドーナツブレイク</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- タイトル画面 -->
+    <div id="title-screen" class="screen">
+        <img src="hyousi.png" alt="タイトル背景" class="background">
+        <button id="play-button" class="styled-button">Play</button>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="game-screen" class="screen hidden">
+        <img src="haikeigame.png" alt="ゲーム背景" class="background">
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <!-- ゲームオーバー画面 -->
+    <div id="game-over-screen" class="screen hidden">
+        <img id="game-over-img" alt="ゲームオーバー" />
+        <p id="game-over-text">GAME OVER</p>
+        <button id="retry-button" class="styled-button">↻ リトライ</button>
+        <button id="title-button" class="styled-button">タイトルへ</button>
+    </div>
+
+    <!-- ゲームクリア画面 -->
+    <div id="game-clear-screen" class="screen hidden">
+        <img id="game-clear-img" alt="ゲームクリア" />
+        <p id="game-clear-text">GAME CLEAR</p>
+        <button id="retry-button-clear" class="styled-button">↻ リトライ</button>
+        <button id="title-button-clear" class="styled-button">タイトルへ</button>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
