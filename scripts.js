@@ -121,10 +121,11 @@ canvas.addEventListener('touchmove', (event) => {
     const distance = touchX - touchStartX;  // 移動距離を計算
     touchStartX = touchX; // タッチ位置を更新
 
+    if (Math.abs(distance) < 5) return; // 5px未満の移動を無視
+
     // パドルの移動
     movePaddleBySwipe(distance);
 });
-if (Math.abs(distance) < 5) return; // 5px未満の移動を無視
 // タッチ終了イベント
 canvas.addEventListener('touchend', () => {
     isSwiping = false; // スワイプ終了
