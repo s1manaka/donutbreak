@@ -211,13 +211,12 @@ canvas.addEventListener('mousemove', (event) => {
     paddleLastX = mouseX;
 });
 
-setTimeout(() => {
-    if (currentDirection === "right") {
-        paddle.img.src = "kanou4.png";
-    } else if (currentDirection === "left") {
-        paddle.img.src = "kanou.png";
-    }
-}, 100); // 100ms後に画像を変更
+// パドルを滑らかに移動させる
+function smoothMovePaddle() {
+    // 現在の位置と目標位置を少しずつ補間する
+    const easingFactor = 0.1; // 補間の速さ（0~1の間で調整）
+    paddle.x += (paddleTargetX - paddle.x) * easingFactor;
+}
 
 // ゲーム更新
 function updateGame() {
