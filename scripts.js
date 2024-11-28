@@ -352,5 +352,4 @@ retryButtonClear.addEventListener('click', () => {
 // タイトルボタン
 titleButton.addEventListener('click', backToTitle);
 titleButtonClear.addEventListener('click', backToTitle);
-
-
+});
