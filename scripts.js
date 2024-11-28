@@ -88,6 +88,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return blocksArray;
     }
 
+     // 衝突チェック関数を改善（ボールが画面端で止まる問題の修正）
+function updateBallDirection(ball) {
+    // 小さなランダム値を加え、完全な直線移動を防ぐ
+    ball.dx += (Math.random() - 0.5) * 0.1;
+    ball.dy += (Math.random() - 0.5) * 0.1;
+
+    // ボール速度の再正規化
+    const speed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2);
+    ball.dx = (ball.dx / speed) * ballSpeed;
+    ball.dy = (ball.dy / speed) * ballSpeed;
+}
+// 衝突判定（ボールと矩形）
+function isColliding(ball, rect) {
+    const closestX = Math.max(rect.x, Math.min(ball.x, rect.x + rect.width));
+    const closestY = Math.max(rect.y, Math.min(ball.y, rect.y + rect.height));
+    const distanceX = ball.x - closestX;
+    const distanceY = ball.y - closestY;
+    return distanceX * distanceX + distanceY * distanceY < ball.radius * ball.radius;
+}
+
     // タッチ開始イベント
     canvas.addEventListener('touchstart', (event) => {
         isSwiping = true; // スワイプ開始
@@ -120,6 +140,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // マウス操作もサポート
+canvas.addEventListener('mousemove', (event) => {
+    const mouseX = event.offsetX;
+    paddle.x = mouseX - paddle.width / 2;
+
+    // 画面外にパドルが出ないように制限
+    if (paddle.x < 0) paddle.x = 0;
+    if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+
+    // マウス移動の方向で画像を変更
+    paddle.img.src = mouseX > paddleLastX ? "kanou4.png" : "kanou.png";
+    paddleLastX = mouseX;
+});
+
     // パドルを滑らかに移動させる
     function smoothMovePaddle() {
         // 現在の位置から目標位置に向かってスムーズに移動
@@ -131,30 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
     }
 
-    // ボールの更新処理
-    function updateBalls() {
-        balls.forEach((ball) => {
-            ball.x += ball.dx;
-            ball.y += ball.dy;
-
-            // ボールが壁に当たったときの処理
-            if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
-                ball.dx = -ball.dx;
-            }
-            if (ball.y - ball.radius < 0) {
-                ball.dy = -ball.dy;
-            }
-
-            // ボールがパドルに当たったときの処理
-            if (
-                ball.y + ball.radius > paddle.y &&
-                ball.x > paddle.x &&
-                ball.x < paddle.x + paddle.width
-            ) {
-                ball.dy = -ball.dy;
-            }
-        });
-    }
 
     // ゲームの描画処理
     function drawGame() {
