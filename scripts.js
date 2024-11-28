@@ -24,8 +24,8 @@ const ballSpeed = 4; // ボールの速度
 let ballAddedOnce = false;
 
 // スワイプ操作用変数
-let swipeStartX = 0; // スワイプの開始位置
-let swipeDistance = 0; // スワイプの移動距離
+let isSwiping = false; // スワイプ中かどうかのフラグ
+let touchStartX = 0;   // スワイプ開始位置
 
 // ゲーム初期化
 function initGame() {
@@ -105,37 +105,41 @@ function isColliding(ball, rect) {
 }
 
 
-// スワイプ専用のパドル移動
+// タッチ開始イベント
+canvas.addEventListener('touchstart', (event) => {
+    isSwiping = true; // スワイプ開始
+    touchStartX = event.touches[0].clientX; // スワイプ開始位置を記録
+});
+
+// タッチ移動イベント
+canvas.addEventListener('touchmove', (event) => {
+    if (!isSwiping) return; // スワイプ中でない場合は無視
+
+    const touchX = event.touches[0].clientX; // 現在のタッチ位置を取得
+    const distance = touchX - touchStartX;  // 移動距離を計算
+    touchStartX = touchX; // タッチ位置を更新
+
+    // パドルの移動
+    movePaddleBySwipe(distance);
+});
+
+// タッチ終了イベント
+canvas.addEventListener('touchend', () => {
+    isSwiping = false; // スワイプ終了
+});
+
+// パドルを移動する関数
 function movePaddleBySwipe(distance) {
-    // スワイプ距離に基づいてパドルを移動
+    // パドルの位置を更新
     paddle.x += distance;
 
     // 画面外に出ないように位置を制限
     if (paddle.x < 0) paddle.x = 0;
     if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
 
-    // スワイプ方向で画像を変更
-    paddle.img.src = distance > 0 ? "kanou4.png" : "kanou.png"; // 右スワイプならkanou4.png、左スワイプならkanou.png
+    // スワイプ方向に応じた画像を設定
+    paddle.img.src = distance > 0 ? "kanou4.png" : "kanou.png"; // 右移動ならkanou4.png、左移動ならkanou.png
 }
-
-// タッチイベント（スワイプ操作用）
-canvas.addEventListener('touchstart', (event) => {
-    // スワイプ開始位置を記録
-    swipeStartX = event.touches[0].clientX;
-});
-
-canvas.addEventListener('touchend', (event) => {
-    // スワイプ終了位置を取得
-    const swipeEndX = event.changedTouches[0].clientX;
-
-    // スワイプ距離を計算
-    swipeDistance = swipeEndX - swipeStartX;
-
-    // スワイプ距離が一定以上の場合にのみパドルを移動
-    if (Math.abs(swipeDistance) > 30) { // 30px以上のスワイプのみ反応
-        movePaddleBySwipe(swipeDistance);
-    }
-});
 
 // ゲームの描画処理
 function drawGame() {
