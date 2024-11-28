@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameRunning = false;
     let paddle, balls, blocks, ballAdded;
     let paddleLastX = 0; // パドルの最後の位置を追跡
-    let paddleTargetX = paddle.x; // パドルの目標位置を追跡
+    let paddleTargetX = 0; // パドルの目標位置を追跡
     const ballSpeed = 4; // ボールの速度
     let ballAddedOnce = false;
 
