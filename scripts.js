@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', () => {
 // HTML要素の取得
 const titleScreen = document.getElementById('title-screen');
 const gameScreen = document.getElementById('game-screen');
