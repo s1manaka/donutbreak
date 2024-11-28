@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.height = 640;
 
     let gameRunning = false;
-    let paddle, balls, blocks, ballAdded;
+    let paddle = {}; // ここで空のオブジェクトを初期化
+    let balls, blocks, ballAdded;
     let paddleLastX = 0; // パドルの最後の位置を追跡
     let paddleTargetX = 0; // パドルの目標位置を追跡
     const ballSpeed = 4; // ボールの速度
@@ -32,11 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ゲーム初期化
     function initGame() {
-        gameRunning = true;
-        ballAdded = false;
-        ballAddedOnce = false;
-
-        // パドル（paddle）の設定
+        // パドルが初期化されることを確認
         paddle = {
             x: canvas.width / 2 - 50,
             y: canvas.height * 0.8,
@@ -62,6 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ブロック生成
         blocks = createBlocks();
+
+        gameRunning = true;
+        ballAdded = false;
+        ballAddedOnce = false;
     }
 
     // ブロック生成
@@ -85,15 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         return blocksArray;
-    }
-
-    // 衝突判定（ボールと矩形）
-    function isColliding(ball, rect) {
-        const closestX = Math.max(rect.x, Math.min(ball.x, rect.x + rect.width));
-        const closestY = Math.max(rect.y, Math.min(ball.y, rect.y + rect.height));
-        const distanceX = ball.x - closestX;
-        const distanceY = ball.y - closestY;
-        return distanceX * distanceX + distanceY * distanceY < ball.radius * ball.radius;
     }
 
     // タッチ開始イベント
@@ -199,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     playButton.addEventListener('click', () => {
         titleScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
-        initGame();
+        initGame(); // ゲーム開始時に必ず初期化
         gameLoop();
     });
 
@@ -207,14 +199,14 @@ document.addEventListener('DOMContentLoaded', () => {
     retryButton.addEventListener('click', () => {
         gameOverScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
-        initGame();
+        initGame(); // リトライ時にも必ず初期化
         gameLoop();
     });
 
     retryButtonClear.addEventListener('click', () => {
         gameClearScreen.classList.add('hidden');
         gameScreen.classList.remove('hidden');
-        initGame();
+        initGame(); // ゲームクリア後も必ず初期化
         gameLoop();
     });
 
