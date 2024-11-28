@@ -291,7 +291,7 @@ function updateGame() {
 
 	    // パドルの位置を滑らかに更新
     smoothMovePaddle();
-}
+
 
 
 // ゲーム終了
