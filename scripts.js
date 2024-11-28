@@ -191,11 +191,6 @@ canvas.addEventListener('touchend', (event) => {
     // スワイプ距離を計算
     const swipeEndX = event.changedTouches[0].clientX;
     swipeDistance = swipeEndX - swipeStartX;
-
-    // スワイプの移動距離が閾値以上ならパドルを動かす
-    if (Math.abs(swipeDistance) > 10) { // 10px以上のスワイプのみ反応
-        movePaddleBySwipe(swipeDistance);
-    }
 });
 
 // マウス操作もサポート
