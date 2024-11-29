@@ -24,6 +24,9 @@ let paddleLastX = 0; // パドルの最後の位置を追跡
 const ballSpeed = 4; // ボールの速度
 let ballAddedOnce = false;
 
+let timer = 0; // 経過時間（秒）
+let timerInterval; // タイマー用のインターバルID
+
 // スワイプ操作用変数
 let isSwiping = false; // スワイプ中かどうかのフラグ
 let touchStartX = 0;   // スワイプ開始位置
@@ -90,26 +93,49 @@ function createBlocks() {
     return blocksArray;
 }
 
-// 衝突チェック関数の改善
+    // タイマーの初期化
+function resetTimer() {
+    timer = 0;
+    clearInterval(timerInterval);
+}
+
+// タイマーの開始
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timer++;
+    }, 1000); // 毎秒1回カウントアップ
+}
+
+// タイマーの停止
+function stopTimer() {
+    clearInterval(timerInterval);
+}
+    
+// ボールの壁との衝突処理を修正
 function handleWallCollision(ball) {
     // 左右の壁との衝突
-    if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
-        ball.dx *= -1;
-        ball.dx += (Math.random() - 0.5) * 0.1; // 小さなランダム値
+    if (ball.x - ball.radius < 0) {
+        ball.dx = Math.abs(ball.dx); // 右方向へ反転
+        ball.x = ball.radius; // ボールを壁の内側に補正
+    } else if (ball.x + ball.radius > canvas.width) {
+        ball.dx = -Math.abs(ball.dx); // 左方向へ反転
+        ball.x = canvas.width - ball.radius; // ボールを壁の内側に補正
     }
 
     // 上部の壁との衝突
-    if (ball.y < ball.radius) {
-        ball.dy *= -1;
-        ball.dy += (Math.random() - 0.5) * 0.1; // 小さなランダム値
+    if (ball.y - ball.radius < 0) {
+        ball.dy = Math.abs(ball.dy); // 下方向へ反転
+        ball.y = ball.radius; // ボールを壁の内側に補正
     }
 
-    // 速度の正規化（頻度を減らす）
+    // ボールの速度を少しランダムに変化（直線移動防止）
+    ball.dx += (Math.random() - 0.5) * 0.1;
+    ball.dy += (Math.random() - 0.5) * 0.1;
+
+    // 速度を正規化して一定のスピードを維持
     const speed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2);
-    if (Math.abs(speed - ballSpeed) > 0.1) { // 速度差が大きい場合のみ補正
-        ball.dx = (ball.dx / speed) * ballSpeed;
-        ball.dy = (ball.dy / speed) * ballSpeed;
-    }
+    ball.dx = (ball.dx / speed) * ballSpeed;
+    ball.dy = (ball.dy / speed) * ballSpeed;
 }
 
 
@@ -304,10 +330,22 @@ function updateGame() {
     }
 }
 
+    // ゲームの開始時にタイマーをリセットしてスタート
+playButton.addEventListener('click', () => {
+    titleScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    resetTimer(); // タイマーをリセット
+    startTimer(); // タイマーを開始
+    initGame();
+    gameRunning = true;
+    gameLoop();
+});
 
-// ゲーム終了
+// ゲームクリア時にタイマーを停止してスコアを表示
 function endGame(isWin) {
     gameRunning = false;
+    stopTimer(); // タイマーを停止
+
     gameOverImg.src = "";
     gameClearImg.src = "";
 
@@ -315,11 +353,23 @@ function endGame(isWin) {
         gameClearImg.src = "gamekuria.png";
         gameScreen.classList.add('hidden');
         gameClearScreen.classList.remove('hidden');
+        displayClearScreen(); // スコアを表示
     } else {
         gameOverImg.src = "gameover.png";
         gameScreen.classList.add('hidden');
         gameOverScreen.classList.remove('hidden');
     }
+}
+
+
+// ゲームクリア画面にスコアを表示
+function displayClearScreen() {
+    const scoreText = document.createElement('div');
+    scoreText.innerText = `スコア: ${timer}秒`;
+    scoreText.style.fontSize = "24px";
+    scoreText.style.color = "black";
+    scoreText.style.textAlign = "center";
+    gameClearScreen.appendChild(scoreText);
 }
 
 // ゲームループ
