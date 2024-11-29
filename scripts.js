@@ -26,6 +26,7 @@ let ballAddedOnce = false;
 
 let timer = 0; // 経過時間（秒）
 let timerInterval; // タイマー用のインターバルID
+const timerElement = document.getElementById("timer"); // タイマーのHTML要素
 
 // スワイプ操作用変数
 let isSwiping = false; // スワイプ中かどうかのフラグ
@@ -92,65 +93,33 @@ function createBlocks() {
     }
     return blocksArray;
 }
-    // タイマー要素の作成
-const timerElement = document.createElement('div');
-timerElement.id = "timer";
-timerElement.style.position = "absolute";
-timerElement.style.top = "10px";
-timerElement.style.left = "50%";
-timerElement.style.transform = "translateX(-50%)";
-timerElement.style.fontSize = "24px";
-timerElement.style.fontWeight = "bold";
-timerElement.style.color = "white";
-timerElement.style.textShadow = "2px 2px 4px rgba(0, 0, 0, 0.8)";
-timerElement.style.zIndex = "100";
-timerElement.style.display = "none"; // 初期は非表示
-document.body.appendChild(timerElement);
 
-// タイマー表示制御関数
-function showTimer() {
-    timerElement.style.display = "block";
-}
-
-function hideTimer() {
-    timerElement.style.display = "none";
-}
-
-
-// タイマーのリセット
+// タイマーの初期化
 function resetTimer() {
     timer = 0;
     updateTimerDisplay(); // 初期表示をリセット
     clearInterval(timerInterval);
 }
 
-// タイマーの更新処理
-let startTime;
+// タイマーの開始
 function startTimer() {
-    startTime = Date.now(); // ゲーム開始時の時間を記録
-    requestAnimationFrame(updateTimer); // タイマーの更新を開始
+    timerInterval = setInterval(() => {
+        timer += 10; // 10ミリ秒単位でカウント
+        updateTimerDisplay();
+    }, 10); // 毎10ミリ秒更新
 }
 
-function updateTimer() {
-    if (!startTime) return; // ゲームが開始されていない場合は何もしない
-    let elapsedTime = Date.now() - startTime;
-    let minutes = Math.floor(elapsedTime / 60000);
-    let seconds = Math.floor((elapsedTime % 60000) / 1000);
-    timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    requestAnimationFrame(updateTimer); // 次のフレームを更新
+// タイマーの停止
+function stopTimer() {
+    clearInterval(timerInterval);
 }
 
-// ゲーム開始時にタイマーを表示
-function initGame() {
-    // ゲーム画面の準備をする
-    showTimer();
-    startTimer(); // タイマーを開始
-}
-
-// ゲームオーバー時にタイマーを非表示
-function endGame() {
-    hideTimer();
-    // ゲームオーバーの処理
+// タイマーの表示を更新
+function updateTimerDisplay() {
+    const totalSeconds = timer / 1000; // ミリ秒を秒に変換
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = (totalSeconds % 60).toFixed(2); // 小数点以下2桁まで表示
+    timerElement.innerText = `${String(minutes).padStart(2, '0')}:${seconds.padStart(5, '0')}`;
 }
     
 // ボールの壁との衝突処理を修正
@@ -382,10 +351,13 @@ playButton.addEventListener('click', () => {
     gameLoop();
 });
 
+// ゲームクリア時にタイマーを停止してスコアを表示
 function endGame(isWin) {
     gameRunning = false;
     stopTimer(); // タイマーを停止
-    hideTimer(); // タイマーを非表示
+
+    gameOverImg.src = "";
+    gameClearImg.src = "";
 
     if (isWin) {
         gameClearImg.src = "gamekuria.png";
@@ -409,15 +381,14 @@ function displayClearScreen() {
     scoreText.id = 'clear-score';
     scoreText.innerText = `スコア: ${timerElement.innerText}`;
     scoreText.style.fontSize = "24px";
-    scoreText.style.color = "white"; // 白色に変更
+    scoreText.style.color = "black";
     scoreText.style.textAlign = "center";
     scoreText.style.position = "absolute";
-    scoreText.style.top = "150px"; // ゲームクリアテキストの下
+    scoreText.style.top = "50px"; // ボタン上部に配置
     scoreText.style.left = "50%";
     scoreText.style.transform = "translateX(-50%)";
     gameClearScreen.appendChild(scoreText);
 }
-
 
 
 // ゲームループ
@@ -436,15 +407,13 @@ function backToTitle() {
     titleScreen.classList.remove('hidden');
 }
 
+// プレイボタンの動作（ループ開始）
 playButton.addEventListener('click', () => {
     titleScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
-    showTimer(); // タイマーを表示
-    resetTimer(); // タイマーをリセット
-    startTimer(); // タイマーを開始
     initGame();
     gameRunning = true;
-    gameLoop();
+    gameLoop(); // 更新をスタート
     drawGame(); // 描画をスタート
 });
 
