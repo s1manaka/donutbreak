@@ -244,8 +244,25 @@ function updateGame() {
         ball.x += ball.dx;
         ball.y += ball.dy;
 
-        // 壁との衝突判定
-        handleWallCollision(ball);
+        // 壁との衝突判定（関数内で直接処理）
+        if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
+            ball.dx *= -1;
+
+            // ランダムな変化を加える
+            ball.dx += (Math.random() - 0.5) * 0.2;
+        }
+
+        if (ball.y < ball.radius) {
+            ball.dy *= -1;
+
+            // ランダムな変化を加える
+            ball.dy += (Math.random() - 0.5) * 0.2;
+        }
+
+        // ボール速度の再正規化
+        const speed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2);
+        ball.dx = (ball.dx / speed) * ballSpeed;
+        ball.dy = (ball.dy / speed) * ballSpeed;
 
         // パドルとの衝突判定
         if (
@@ -261,12 +278,13 @@ function updateGame() {
             ball.dy = -speed * Math.cos(angle);
         }
 
-
-// ブロックとの衝突判定部分を修正
-	blocks.forEach((block) => {
-  　　  if (!block.hit && isColliding(ball, block)) {
-        block.hit = true;
-        ball.dy *= -1;
+        // ブロックとの衝突処理
+        blocks.forEach((block) => {
+            if (!block.hit && isColliding(ball, block)) {
+                block.hit = true;
+                ball.dy *= -1;
+            }
+        });
         updateBallDirection(ball);
 
         // ブロックの半数が壊れた時にボールを1回だけ追加
