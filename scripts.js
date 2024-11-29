@@ -31,9 +31,8 @@ let currentDirection = ""; // 現在のパドルの向き ("left" or "right")
 
 // ゲーム初期化
 function initGame() {
-    gameRunning = true;
-    ballAdded = false;
-    ballAddedOnce = false;
+    gameRunning = true; // ゲームを実行状態に
+    ballAddedOnce = false; // ボール追加のフラグをリセット
 
     // パドル（paddle）の設定
     paddle = {
@@ -61,6 +60,10 @@ function initGame() {
 
     // ブロック生成
     blocks = createBlocks();
+
+        // 描画の初期化
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // 画面をクリア
+    drawGame(); // 初期状態を描画
 }
 
 // ブロック生成
@@ -340,17 +343,20 @@ playButton.addEventListener('click', () => {
 retryButton.addEventListener('click', () => {
     gameOverScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
-    initGame();
-    requestAnimationFrame(gameLoop);
+    initGame(); // ゲーム状態をリセット
+    gameRunning = true; // ゲームを開始状態に設定
+    gameLoop(); // ゲームループを再スタート
 });
 
 // リトライボタンの動作（ゲームクリア画面）
 retryButtonClear.addEventListener('click', () => {
     gameClearScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
-    initGame();
-    requestAnimationFrame(gameLoop);
+    initGame(); // ゲーム状態をリセット
+    gameRunning = true; // ゲームを開始状態に設定
+    gameLoop(); // ゲームループを再スタート
 });
+
 
 // タイトルボタン
 titleButton.addEventListener('click', backToTitle);
