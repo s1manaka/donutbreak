@@ -86,14 +86,14 @@ function createBlocks() {
     return blocksArray;
 }
 
-// 衝突チェック関数を改善（ボールが画面端で止まる問題の修正）
+// 衝突チェック関数を改善（速度計算の修正）
 function handleWallCollision(ball) {
     // 左右の壁との衝突
     if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
         ball.dx *= -1;
 
         // ランダムな変化を加える（直線移動を防止）
-        ball.dx += (Math.random() - 0.5) * 0.2;
+        ball.dx += (Math.random() - 0.3) * 0.1; // 小さな変化
     }
 
     // 上部の壁との衝突
@@ -101,14 +101,17 @@ function handleWallCollision(ball) {
         ball.dy *= -1;
 
         // ランダムな変化を加える
-        ball.dy += (Math.random() - 0.5) * 0.2;
+        ball.dy += (Math.random() - 0.3) * 0.1;
     }
 
-    // ボール速度の再正規化
+    // ボール速度の再正規化（最初の速度を維持）
     const speed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2);
-    ball.dx = (ball.dx / speed) * ballSpeed;
-    ball.dy = (ball.dy / speed) * ballSpeed;
+    if (Math.abs(speed - ballSpeed) > 0.01) { // 速度誤差が小さい場合のみ補正
+        ball.dx = (ball.dx / speed) * ballSpeed;
+        ball.dy = (ball.dy / speed) * ballSpeed;
+    }
 }
+
 
 // 衝突判定（ボールと矩形）
 function isColliding(ball, rect) {
@@ -151,8 +154,7 @@ canvas.addEventListener('touchend', () => {
         }
     }, 200); // スワイプ終了後200ms待機して画像を戻す
 });
-
-// パドルをスワイプで動かす関数（改良版）
+// パドルをスワイプで動かす関数
 function movePaddleBySwipe(distance) {
     // パドルの位置を更新
     paddle.x += distance;
@@ -168,6 +170,38 @@ function movePaddleBySwipe(distance) {
         paddle.img.src = currentDirection === "right" ? "kanou4.png" : "kanou.png";
     }
 }
+
+// マウス移動でのパドル制御（最適化）
+canvas.addEventListener('mousemove', (event) => {
+    const mouseX = event.offsetX;
+
+    // パドルを動かす（リアルタイム反応）
+    paddle.x = mouseX - paddle.width / 2;
+
+    // 画面外に出ないように制限
+    if (paddle.x < 0) paddle.x = 0;
+    if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+
+    // 方向に応じた画像変更
+    const newDirection = mouseX > paddleLastX ? "right" : "left";
+    if (newDirection !== currentDirection) {
+        currentDirection = newDirection;
+        paddle.img.src = currentDirection === "right" ? "kanou4.png" : "kanou.png";
+    }
+    paddleLastX = mouseX; // パドルの位置を更新
+});
+
+// タッチ移動でのパドル制御（最適化）
+canvas.addEventListener('touchmove', (event) => {
+    if (!isSwiping) return; // スワイプ中でない場合は無視
+
+    const touchX = event.touches[0].clientX; // 現在のタッチ位置を取得
+    const distance = touchX - touchStartX;  // 移動距離を計算
+    touchStartX = touchX; // タッチ位置を更新
+
+    movePaddleBySwipe(distance);
+});
+
 
 // ゲームの描画処理
 function drawGame() {
