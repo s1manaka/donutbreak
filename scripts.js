@@ -26,6 +26,7 @@ let ballAddedOnce = false;
 
 let timer = 0; // 経過時間（秒）
 let timerInterval; // タイマー用のインターバルID
+const timerElement = document.getElementById("timer"); // タイマーのHTML要素
 
 // スワイプ操作用変数
 let isSwiping = false; // スワイプ中かどうかのフラグ
@@ -93,22 +94,32 @@ function createBlocks() {
     return blocksArray;
 }
 
-    // タイマーの初期化
+// タイマーの初期化
 function resetTimer() {
     timer = 0;
+    updateTimerDisplay(); // 初期表示をリセット
     clearInterval(timerInterval);
 }
 
 // タイマーの開始
 function startTimer() {
     timerInterval = setInterval(() => {
-        timer++;
-    }, 1000); // 毎秒1回カウントアップ
+        timer += 10; // 10ミリ秒単位でカウント
+        updateTimerDisplay();
+    }, 10); // 毎10ミリ秒更新
 }
 
 // タイマーの停止
 function stopTimer() {
     clearInterval(timerInterval);
+}
+
+// タイマーの表示を更新
+function updateTimerDisplay() {
+    const totalSeconds = timer / 1000; // ミリ秒を秒に変換
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = (totalSeconds % 60).toFixed(2); // 小数点以下2桁まで表示
+    timerElement.innerText = `${String(minutes).padStart(2, '0')}:${seconds.padStart(5, '0')}`;
 }
     
 // ボールの壁との衝突処理を修正
@@ -329,8 +340,7 @@ function updateGame() {
         endGame(true);
     }
 }
-
-    // ゲームの開始時にタイマーをリセットしてスタート
+// ゲーム開始時にタイマーをリセットしてスタート
 playButton.addEventListener('click', () => {
     titleScreen.classList.add('hidden');
     gameScreen.classList.remove('hidden');
@@ -360,17 +370,26 @@ function endGame(isWin) {
         gameOverScreen.classList.remove('hidden');
     }
 }
-
-
-// ゲームクリア画面にスコアを表示
+    
 function displayClearScreen() {
+    // 既存のスコア要素を削除（再表示時の重複を防ぐ）
+    const existingScore = document.getElementById('clear-score');
+    if (existingScore) existingScore.remove();
+
+    // スコア要素を作成
     const scoreText = document.createElement('div');
-    scoreText.innerText = `スコア: ${timer}秒`;
+    scoreText.id = 'clear-score';
+    scoreText.innerText = `スコア: ${timerElement.innerText}`;
     scoreText.style.fontSize = "24px";
     scoreText.style.color = "black";
     scoreText.style.textAlign = "center";
+    scoreText.style.position = "absolute";
+    scoreText.style.top = "50px"; // ボタン上部に配置
+    scoreText.style.left = "50%";
+    scoreText.style.transform = "translateX(-50%)";
     gameClearScreen.appendChild(scoreText);
 }
+
 
 // ゲームループ
 function gameLoop() {
