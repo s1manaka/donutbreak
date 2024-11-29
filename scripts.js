@@ -257,26 +257,10 @@ function updateGame() {
         ball.x += ball.dx;
         ball.y += ball.dy;
 
-    　 // 壁との衝突判定（関数を呼び出し）
+        // 壁との衝突判定（関数を呼び出し）
         handleWallCollision(ball);
 
-            // ランダムな変化を加える
-            ball.dx += (Math.random() - 0.5) * 0.2;
-        });
-
-        if (ball.y < ball.radius) {
-            ball.dy *= -1;
-
-            // ランダムな変化を加える
-            ball.dy += (Math.random() - 0.5) * 0.2;
-        }
-
-        // ボール速度の再正規化
-        const speed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2);
-        ball.dx = (ball.dx / speed) * ballSpeed;
-        ball.dy = (ball.dy / speed) * ballSpeed;
-
-       // パドルとの衝突判定
+        // パドルとの衝突判定
         if (
             ball.y + ball.radius > paddle.y &&
             ball.x > paddle.x &&
@@ -300,7 +284,6 @@ function updateGame() {
                 ball.dy += (Math.random() - 0.5) * 0.2;
             }
         });
-        updateBallDirection(ball);
 
         // ブロックの半数が壊れた時にボールを1回だけ追加
         if (
@@ -318,8 +301,6 @@ function updateGame() {
             balls[balls.length - 1].img.src = "boll2.png"; // 追加ボール画像
             ballAddedOnce = true; // ボール追加フラグを立てる
         }
-    }
-});
 
         // ボールが画面外に出た場合
         if (ball.y > canvas.height) {
@@ -333,6 +314,7 @@ function updateGame() {
         endGame(true);
     }
 }
+
 
 // ゲーム終了
 function endGame(isWin) {
