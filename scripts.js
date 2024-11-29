@@ -179,7 +179,11 @@ function drawGame() {
             ctx.drawImage(block.img, block.x, block.y, block.width, block.height);
         }
     });
+
+    // 次のフレームの描画をスケジュール
+    requestAnimationFrame(drawGame);
 }
+
 
 // パドルをスワイプで動かす関数
 function movePaddleBySwipe(distance) {
@@ -233,22 +237,15 @@ setTimeout(() => {
     }
 }, 100); // 100ms後に画像を変更
 
-// ゲーム更新
+// ゲーム更新処理
 function updateGame() {
     balls.forEach((ball) => {
         // ボールの移動
         ball.x += ball.dx;
         ball.y += ball.dy;
 
-        // 壁との衝突
-        if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
-            ball.dx *= -1;
-            updateBallDirection(ball);
-        }
-        if (ball.y < ball.radius) {
-            ball.dy *= -1;
-            updateBallDirection(ball);
-        }
+        // 壁との衝突判定
+        handleWallCollision(ball);
 
         // パドルとの衝突判定
         if (
