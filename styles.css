@@ -71,6 +71,10 @@ body {
     background-color: transparent;
 }
 
+#game-canvas img {
+    transition: transform 0.2s ease, opacity 0.2s ease; /* 画像のスムーズな切り替え */
+}
+
 /* ゲームオーバー＆クリア画面 */
 #game-over-img, #game-clear-img {
     max-width: 50%;
