@@ -26,7 +26,6 @@ let ballAddedOnce = false;
 
 let timer = 0; // 経過時間（秒）
 let timerInterval; // タイマー用のインターバルID
-const timerElement = document.getElementById("timer"); // タイマーのHTML要素
 
 // スワイプ操作用変数
 let isSwiping = false; // スワイプ中かどうかのフラグ
@@ -94,7 +93,7 @@ function createBlocks() {
     return blocksArray;
 }
     // タイマー要素の作成
-const timerElement = document.createElement('div');
+let timerElement = document.createElement('div');
 timerElement.id = "timer";
 timerElement.style.position = "absolute";
 timerElement.style.top = "10px";
@@ -125,32 +124,33 @@ function resetTimer() {
     clearInterval(timerInterval);
 }
 
-// タイマーの開始
+// タイマーの更新処理
+let startTime;
 function startTimer() {
-    timerInterval = setInterval(() => {
-        timer += 10; // 10ミリ秒単位でカウント
-        updateTimerDisplay();
-    }, 10); // 毎10ミリ秒更新
+    startTime = Date.now(); // ゲーム開始時の時間を記録
+    requestAnimationFrame(updateTimer); // タイマーの更新を開始
 }
 
-// リトライ時にタイマーを必ずリセット
-retryButton.addEventListener('click', () => {
-    gameOverScreen.classList.add('hidden');
-    gameScreen.classList.remove('hidden');
-    resetTimer(); // タイマーをリセット
-    startTimer(); // タイマーを再開
-    initGame();
-    gameRunning = true;
-    gameLoop();
-});
+function updateTimer() {
+    if (!startTime) return; // ゲームが開始されていない場合は何もしない
+    let elapsedTime = Date.now() - startTime;
+    let minutes = Math.floor(elapsedTime / 60000);
+    let seconds = Math.floor((elapsedTime % 60000) / 1000);
+    timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    requestAnimationFrame(updateTimer); // 次のフレームを更新
+}
 
+// ゲーム開始時にタイマーを表示
+function initGame() {
+    // ゲーム画面の準備をする
+    showTimer();
+    startTimer(); // タイマーを開始
+}
 
-// タイマーの表示を更新
-function updateTimerDisplay() {
-    const totalSeconds = timer / 1000; // ミリ秒を秒に変換
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = (totalSeconds % 60).toFixed(2); // 小数点以下2桁まで表示
-    timerElement.innerText = `${String(minutes).padStart(2, '0')}:${seconds.padStart(5, '0')}`;
+// ゲームオーバー時にタイマーを非表示
+function endGame() {
+    hideTimer();
+    // ゲームオーバーの処理
 }
     
 // ボールの壁との衝突処理を修正
