@@ -262,7 +262,7 @@ function updateGame() {
 
             // ランダムな変化を加える
             ball.dx += (Math.random() - 0.5) * 0.2;
-        }
+        });
 
         if (ball.y < ball.radius) {
             ball.dy *= -1;
