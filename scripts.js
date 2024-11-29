@@ -126,18 +126,20 @@ canvas.addEventListener('touchmove', (event) => {
     // パドルの移動
     movePaddleBySwipe(distance);
 });
-// タッチ終了イベント
+    // タッチ終了時の画像リセットのタイミングを調整（改良版）
 canvas.addEventListener('touchend', () => {
     isSwiping = false; // スワイプ終了
-    // パドルの向きを保持
-    if (currentDirection === "right") {
-        paddle.img.src = "kanou4.png"; // 右向き画像
-    } else if (currentDirection === "left") {
-        paddle.img.src = "kanou.png"; // 左向き画像
-    }
+    // パドル画像をスムーズに戻す
+    setTimeout(() => {
+        if (currentDirection === "right") {
+            paddle.img.src = "kanou4.png";
+        } else if (currentDirection === "left") {
+            paddle.img.src = "kanou.png";
+        }
+    }, 200); // スワイプ終了後200ms待機して画像を戻す
 });
 
-// パドルを移動する関数
+// パドルをスワイプで動かす関数（改良版）
 function movePaddleBySwipe(distance) {
     // パドルの位置を更新
     paddle.x += distance;
@@ -147,12 +149,10 @@ function movePaddleBySwipe(distance) {
     if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
 
     // スワイプ方向に応じた画像を設定
-    if (distance > 0) {
-        paddle.img.src = "kanou4.png"; // 右移動ならkanou4.png
-        currentDirection = "right"; // 現在の向きを右に設定
-    } else if (distance < 0) {
-        paddle.img.src = "kanou.png"; // 左移動ならkanou.png
-        currentDirection = "left"; // 現在の向きを左に設定
+    const newDirection = distance > 0 ? "right" : "left";
+    if (newDirection !== currentDirection) { // 方向が変わった時だけ変更
+        currentDirection = newDirection;
+        paddle.img.src = currentDirection === "right" ? "kanou4.png" : "kanou.png";
     }
 }
 
