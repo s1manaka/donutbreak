@@ -178,34 +178,46 @@ function drawGame() {
 
 
 
-// パドルをスワイプで動かす関数
-function movePaddleBySwipe(distance) {
-    // スワイプ距離に応じてパドルの位置を移動
-    paddle.x += distance;
+// パドルを指に追従させる関数
+function movePaddleTo(touchX) {
+    // タッチ位置にパドルの中心を合わせる
+    paddle.x = touchX - paddle.width / 2;
 
-    // 画面外にパドルが出ないように制限
+    // パドルが画面外に出ないように制限
     if (paddle.x < 0) paddle.x = 0;
     if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
-
-    // スワイプ方向に応じた画像を設定
-    paddle.img.src = distance > 0 ? "kanou4.png" : "kanou.png"; // 右スワイプならkanou4.png、左スワイプならkanou.png
 }
 
-// タッチイベントの設定
+// タッチ開始イベント
 canvas.addEventListener('touchstart', (event) => {
-    // 最初のタッチ位置を記録
-    swipeStartX = event.touches[0].clientX;
+    isSwiping = true; // スワイプ開始
+    const touchX = event.touches[0].clientX;
+    movePaddleTo(touchX); // 初期位置にパドルを移動
 });
 
-canvas.addEventListener('touchend', (event) => {
-    // スワイプ距離を計算
-    const swipeEndX = event.changedTouches[0].clientX;
-    swipeDistance = swipeEndX - swipeStartX;
+// タッチ移動イベント
+canvas.addEventListener('touchmove', (event) => {
+    if (!isSwiping) return; // スワイプ中でない場合は無視
 
-    // スワイプの移動距離が閾値以上ならパドルを動かす
-    if (Math.abs(swipeDistance) > 10) { // 10px以上のスワイプのみ反応
-        movePaddleBySwipe(swipeDistance);
+    const touchX = event.touches[0].clientX; // 現在のタッチ位置を取得
+    movePaddleTo(touchX); // パドルを指の位置に追従
+
+    // パドル画像を移動方向に応じて切り替え
+    const newDirection = touchX > paddle.x + paddle.width / 2 ? "right" : "left";
+    if (newDirection !== currentDirection) {
+        currentDirection = newDirection;
+        paddle.img.src = currentDirection === "right" ? "kanou4.png" : "kanou.png";
     }
+});
+
+// タッチ終了イベント
+canvas.addEventListener('touchend', () => {
+    isSwiping = false; // スワイプ終了
+
+    // 操作を終了した際に画像をリセット（必要に応じて）
+    setTimeout(() => {
+        paddle.img.src = "kanou.png"; // 左向き画像に戻す
+    }, 100);
 });
 
 // マウス操作もサポート
