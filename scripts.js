@@ -87,16 +87,29 @@ function createBlocks() {
 }
 
 // 衝突チェック関数を改善（ボールが画面端で止まる問題の修正）
-function updateBallDirection(ball) {
-    // 小さなランダム値を加え、完全な直線移動を防ぐ
-    ball.dx += (Math.random() - 0.5) * 0.1;
-    ball.dy += (Math.random() - 0.5) * 0.1;
+function handleWallCollision(ball) {
+    // 左右の壁との衝突
+    if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
+        ball.dx *= -1;
+
+        // ランダムな変化を加える（直線移動を防止）
+        ball.dx += (Math.random() - 0.5) * 0.2;
+    }
+
+    // 上部の壁との衝突
+    if (ball.y < ball.radius) {
+        ball.dy *= -1;
+
+        // ランダムな変化を加える
+        ball.dy += (Math.random() - 0.5) * 0.2;
+    }
 
     // ボール速度の再正規化
     const speed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2);
     ball.dx = (ball.dx / speed) * ballSpeed;
     ball.dy = (ball.dy / speed) * ballSpeed;
 }
+
 // 衝突判定（ボールと矩形）
 function isColliding(ball, rect) {
     const closestX = Math.max(rect.x, Math.min(ball.x, rect.x + rect.width));
@@ -244,9 +257,8 @@ function updateGame() {
         ball.x += ball.dx;
         ball.y += ball.dy;
 
-        // 壁との衝突判定（関数内で直接処理）
-        if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
-            ball.dx *= -1;
+    　 // 壁との衝突判定（関数を呼び出し）
+        handleWallCollision(ball);
 
             // ランダムな変化を加える
             ball.dx += (Math.random() - 0.5) * 0.2;
@@ -264,7 +276,7 @@ function updateGame() {
         ball.dx = (ball.dx / speed) * ballSpeed;
         ball.dy = (ball.dy / speed) * ballSpeed;
 
-        // パドルとの衝突判定
+       // パドルとの衝突判定
         if (
             ball.y + ball.radius > paddle.y &&
             ball.x > paddle.x &&
@@ -283,6 +295,9 @@ function updateGame() {
             if (!block.hit && isColliding(ball, block)) {
                 block.hit = true;
                 ball.dy *= -1;
+
+                // ランダムな変化を加える
+                ball.dy += (Math.random() - 0.5) * 0.2;
             }
         });
         updateBallDirection(ball);
