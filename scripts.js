@@ -24,10 +24,6 @@ let paddleLastX = 0; // パドルの最後の位置を追跡
 const ballSpeed = 4; // ボールの速度
 let ballAddedOnce = false;
 
-let timer = 0; // 経過時間（秒）
-let timerInterval; // タイマー用のインターバルID
-const timerElement = document.getElementById("timer"); // タイマーのHTML要素
-
 // スワイプ操作用変数
 let isSwiping = false; // スワイプ中かどうかのフラグ
 let touchStartX = 0;   // スワイプ開始位置
@@ -94,59 +90,26 @@ function createBlocks() {
     return blocksArray;
 }
 
-// タイマーの初期化
-function resetTimer() {
-    timer = 0;
-    updateTimerDisplay(); // 初期表示をリセット
-    clearInterval(timerInterval);
-}
-
-// タイマーの開始
-function startTimer() {
-    timerInterval = setInterval(() => {
-        timer += 10; // 10ミリ秒単位でカウント
-        updateTimerDisplay();
-    }, 10); // 毎10ミリ秒更新
-}
-
-// タイマーの停止
-function stopTimer() {
-    clearInterval(timerInterval);
-}
-
-// タイマーの表示を更新
-function updateTimerDisplay() {
-    const totalSeconds = timer / 1000; // ミリ秒を秒に変換
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = (totalSeconds % 60).toFixed(2); // 小数点以下2桁まで表示
-    timerElement.innerText = `${String(minutes).padStart(2, '0')}:${seconds.padStart(5, '0')}`;
-}
-    
-// ボールの壁との衝突処理を修正
+// 衝突チェック関数の改善
 function handleWallCollision(ball) {
     // 左右の壁との衝突
-    if (ball.x - ball.radius < 0) {
-        ball.dx = Math.abs(ball.dx); // 右方向へ反転
-        ball.x = ball.radius; // ボールを壁の内側に補正
-    } else if (ball.x + ball.radius > canvas.width) {
-        ball.dx = -Math.abs(ball.dx); // 左方向へ反転
-        ball.x = canvas.width - ball.radius; // ボールを壁の内側に補正
+    if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
+        ball.dx *= -1;
+        ball.dx += (Math.random() - 0.5) * 0.1; // 小さなランダム値
     }
 
     // 上部の壁との衝突
-    if (ball.y - ball.radius < 0) {
-        ball.dy = Math.abs(ball.dy); // 下方向へ反転
-        ball.y = ball.radius; // ボールを壁の内側に補正
+    if (ball.y < ball.radius) {
+        ball.dy *= -1;
+        ball.dy += (Math.random() - 0.5) * 0.1; // 小さなランダム値
     }
 
-    // ボールの速度を少しランダムに変化（直線移動防止）
-    ball.dx += (Math.random() - 0.5) * 0.1;
-    ball.dy += (Math.random() - 0.5) * 0.1;
-
-    // 速度を正規化して一定のスピードを維持
+    // 速度の正規化（頻度を減らす）
     const speed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2);
-    ball.dx = (ball.dx / speed) * ballSpeed;
-    ball.dy = (ball.dy / speed) * ballSpeed;
+    if (Math.abs(speed - ballSpeed) > 0.1) { // 速度差が大きい場合のみ補正
+        ball.dx = (ball.dx / speed) * ballSpeed;
+        ball.dy = (ball.dy / speed) * ballSpeed;
+    }
 }
 
 
@@ -340,22 +303,11 @@ function updateGame() {
         endGame(true);
     }
 }
-// ゲーム開始時にタイマーをリセットしてスタート
-playButton.addEventListener('click', () => {
-    titleScreen.classList.add('hidden');
-    gameScreen.classList.remove('hidden');
-    resetTimer(); // タイマーをリセット
-    startTimer(); // タイマーを開始
-    initGame();
-    gameRunning = true;
-    gameLoop();
-});
 
-// ゲームクリア時にタイマーを停止してスコアを表示
+
+// ゲーム終了
 function endGame(isWin) {
     gameRunning = false;
-    stopTimer(); // タイマーを停止
-
     gameOverImg.src = "";
     gameClearImg.src = "";
 
@@ -363,33 +315,12 @@ function endGame(isWin) {
         gameClearImg.src = "gamekuria.png";
         gameScreen.classList.add('hidden');
         gameClearScreen.classList.remove('hidden');
-        displayClearScreen(); // スコアを表示
     } else {
         gameOverImg.src = "gameover.png";
         gameScreen.classList.add('hidden');
         gameOverScreen.classList.remove('hidden');
     }
 }
-    
-function displayClearScreen() {
-    // 既存のスコア要素を削除（再表示時の重複を防ぐ）
-    const existingScore = document.getElementById('clear-score');
-    if (existingScore) existingScore.remove();
-
-    // スコア要素を作成
-    const scoreText = document.createElement('div');
-    scoreText.id = 'clear-score';
-    scoreText.innerText = `スコア: ${timerElement.innerText}`;
-    scoreText.style.fontSize = "24px";
-    scoreText.style.color = "black";
-    scoreText.style.textAlign = "center";
-    scoreText.style.position = "absolute";
-    scoreText.style.top = "50px"; // ボタン上部に配置
-    scoreText.style.left = "50%";
-    scoreText.style.transform = "translateX(-50%)";
-    gameClearScreen.appendChild(scoreText);
-}
-
 
 // ゲームループ
 function gameLoop() {
