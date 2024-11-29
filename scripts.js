@@ -93,7 +93,7 @@ function createBlocks() {
     return blocksArray;
 }
     // タイマー要素の作成
-let timerElement = document.createElement('div');
+const timerElement = document.createElement('div');
 timerElement.id = "timer";
 timerElement.style.position = "absolute";
 timerElement.style.top = "10px";
