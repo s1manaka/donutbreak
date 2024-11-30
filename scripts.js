@@ -40,7 +40,7 @@ function initGame() {
         x: canvas.width / 2 - 50,
         y: canvas.height * 0.8,
         width: 100,
-        height: 80,
+        height: 75,
         img: new Image(),
         speed: 6,
     };
