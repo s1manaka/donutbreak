@@ -21,7 +21,7 @@ canvas.height = 640;
 let gameRunning = false;
 let paddle, balls, blocks, ballAdded;
 let paddleLastX = 0; // パドルの最後の位置を追跡
-const ballSpeed = 4; // ボールの速度
+const ballSpeed = 6; // ボールの速度
 let ballAddedOnce = false;
 
 // スワイプ操作用変数
