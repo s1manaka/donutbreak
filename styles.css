@@ -31,10 +31,12 @@ body {
 /* 背景画像 */
 .background {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1;
+    top: -5%; /* 全体を少し上に移動 */
+    left: 0;
+    width: 110%; /* 横幅を全体に設定 */
+    height: 110%; /* 高さを画面を少し超えるように調整 */
+    object-fit: cover; /* アスペクト比を維持しつつ画面を埋める */
+    z-index: -1; /* 背景として表示 */
 }
 
 /* ボタン */
@@ -68,9 +70,10 @@ body {
 
 /* ゲームキャンバス */
 #game-canvas {
+    position: relative;
     width: 100%;
-    height: 100%;
-    background-color: transparent;
+    height: 100vh; /* スマホ画面全体をカバー */
+    overflow: hidden;
 }
 
 #game-canvas img {
