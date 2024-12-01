@@ -9,20 +9,7 @@ body {
     background-color: #4ea7a3; /* 背景色 */
 }
 
-/* スクリーン全体をカバー */
-.screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    text-align: center;
-}
+
 
 .hidden {
     display: none;
