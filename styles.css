@@ -8,18 +8,18 @@ body {
 }
 
 /* スクリーン全体をカバー */
-.screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+#game-screen {
+    position: relative;
+    width: 100vw; /* ビューポートの幅に合わせる */
+    height: 100vh; /* ビューポートの高さに合わせる */
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    color: white;
-    text-align: center;
+    align-items: center;
+    background-image: url('haikeigame.png'); /* 背景画像を設定 */
+    background-size: cover; /* 縦横比を維持してトリミング */
+    background-position: center; /* 中央に配置 */
+    background-repeat: no-repeat; /* 繰り返しを防ぐ */
+    overflow: hidden; /* 画面外を隠す */
 }
 
 .hidden {
@@ -68,9 +68,10 @@ body {
 
 /* ゲームキャンバス */
 #game-canvas {
-    width: 100%;
-    height: 100%;
-    background-color: transparent;
+    position: relative;
+    width: 360px; /* ゲームの固定幅 */
+    height: 640px; /* ゲームの固定高さ */
+    background: transparent; /* 背景は透明 */
 }
 
 #game-canvas img {
