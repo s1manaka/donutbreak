@@ -155,6 +155,8 @@ function drawGame() {
     // 背景画像の描画はCSSで管理するため削除
     ctx.clearRect(0, 0, canvas.width, canvas.height); // 前フレームをクリア
     const backgroundImage = new Image();
+        backgroundImage.src = "haikeigame.png";
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
     // パドルの描画
     ctx.drawImage(paddle.img, paddle.x, paddle.y, paddle.width, paddle.height);
