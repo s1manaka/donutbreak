@@ -152,11 +152,42 @@ canvas.addEventListener('touchmove', (event) => {
 function drawGame() {
     if (!gameRunning) return;
 
-    // 背景画像の描画
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // 前フレームをクリア
-    const backgroundImage = new Image();
-    backgroundImage.src = "haikeigame.png";
-    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+// 背景画像の描画
+ctx.clearRect(0, 0, canvas.width, canvas.height); // 前フレームをクリア
+
+const backgroundImage = new Image();
+backgroundImage.src = "haikeigame.png";
+
+// 画像がロードされた後に描画
+backgroundImage.onload = () => {
+    // canvas と画像のアスペクト比を計算
+    const canvasAspect = canvas.width / canvas.height;
+    const imgAspect = backgroundImage.width / backgroundImage.height;
+
+    let sx, sy, sWidth, sHeight;
+
+    if (canvasAspect > imgAspect) {
+        // canvas が横長の場合、画像の上下をトリミング
+        sWidth = backgroundImage.width;
+        sHeight = backgroundImage.width / canvasAspect;
+        sx = 0;
+        sy = (backgroundImage.height - sHeight) / 2;
+    } else {
+        // canvas が縦長の場合、画像の左右をトリミング
+        sWidth = backgroundImage.height * canvasAspect;
+        sHeight = backgroundImage.height;
+        sx = (backgroundImage.width - sWidth) / 2;
+        sy = 0;
+    }
+
+    // トリミングして描画
+    ctx.drawImage(
+        backgroundImage, // 画像
+        sx, sy, sWidth, sHeight, // トリミング範囲
+        0, 0, canvas.width, canvas.height // 描画範囲
+    );
+};
+
 
     // パドルの描画
     ctx.drawImage(paddle.img, paddle.x, paddle.y, paddle.width, paddle.height);
