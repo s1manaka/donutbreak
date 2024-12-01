@@ -26,11 +26,13 @@ body {
     display: none;
 }
 
-#game-screen {
-    background-image: url("haikeigame.png"); /* 背景画像を適用 */
-    background-size: cover; /* 画面全体をカバー */
-    background-position: center; /* 中央を基準にトリミング */
-    background-repeat: no-repeat; /* 繰り返しを防止 */
+.background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 画面全体にトリミング */
+    object-position: center; /* 中央を基準に表示 */
+    z-index: -1; /* 背景として最背面に配置 */
 }
 
 
