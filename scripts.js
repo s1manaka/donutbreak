@@ -152,42 +152,11 @@ canvas.addEventListener('touchmove', (event) => {
 function drawGame() {
     if (!gameRunning) return;
 
-// 背景画像の描画
-ctx.clearRect(0, 0, canvas.width, canvas.height); // 前フレームをクリア
-
-const backgroundImage = new Image();
-backgroundImage.src = "haikeigame.png";
-
-// 画像がロードされた後に描画
-backgroundImage.onload = () => {
-    // canvas と画像のアスペクト比を計算
-    const canvasAspect = canvas.width / canvas.height;
-    const imgAspect = backgroundImage.width / backgroundImage.height;
-
-    let sx, sy, sWidth, sHeight;
-
-    if (canvasAspect > imgAspect) {
-        // canvas が横長の場合、画像の上下をトリミング
-        sWidth = backgroundImage.width;
-        sHeight = backgroundImage.width / canvasAspect;
-        sx = 0;
-        sy = (backgroundImage.height - sHeight) / 2;
-    } else {
-        // canvas が縦長の場合、画像の左右をトリミング
-        sWidth = backgroundImage.height * canvasAspect;
-        sHeight = backgroundImage.height;
-        sx = (backgroundImage.width - sWidth) / 2;
-        sy = 0;
-    }
-
-    // トリミングして描画
-    ctx.drawImage(
-        backgroundImage, // 画像
-        sx, sy, sWidth, sHeight, // トリミング範囲
-        0, 0, canvas.width, canvas.height // 描画範囲
-    );
-};
-
+    // 背景画像の描画
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // 前フレームをクリア
+    const backgroundImage = new Image();
+    backgroundImage.src = "haikeigame.png";
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
     // パドルの描画
     ctx.drawImage(paddle.img, paddle.x, paddle.y, paddle.width, paddle.height);
@@ -280,31 +249,19 @@ function updateGame() {
         // 壁との衝突判定（関数を呼び出し）
         handleWallCollision(ball);
 
- // パドルとの衝突判定（修正）
-if (
-    ball.y + ball.radius > paddle.y && // ボールがパドルの高さに達した
-    ball.x > paddle.x - ball.radius && // ボールがパドルの左端を超えた
-    ball.x < paddle.x + paddle.width + ball.radius // ボールがパドルの右端を超えない
-) {
-    const hitPosition = (ball.x - paddle.x) / paddle.width; // 0~1の範囲で衝突位置を計算
-    const angle = (hitPosition - 0.5) * Math.PI / 2; // 反射角を計算
-    const speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy); // ボール速度を一定に
+        // パドルとの衝突判定
+        if (
+            ball.y + ball.radius > paddle.y &&
+            ball.x > paddle.x &&
+            ball.x < paddle.x + paddle.width
+        ) {
+            const hitPosition = (ball.x - paddle.x) / paddle.width; // 0~1の範囲で衝突位置を計算
+            const angle = (hitPosition - 0.5) * Math.PI / 2; // 反射角を計算
+            const speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy); // ボール速度を一定に
 
-    // 新しい速度成分を計算
-    ball.dx = speed * Math.sin(angle);
-    ball.dy = -speed * Math.cos(angle);
-
-        // ボールがパドルと画面端で重なる場合の修正
-    if (ball.x < ball.radius) {
-        ball.x = ball.radius; // ボールを画面内に戻す
-        ball.dx = Math.abs(ball.dx); // x方向速度を正にする
-    }
-    if (ball.x > canvas.width - ball.radius) {
-        ball.x = canvas.width - ball.radius; // ボールを画面内に戻す
-        ball.dx = -Math.abs(ball.dx); // x方向速度を負にする
-    }
-}
-
+            ball.dx = speed * Math.sin(angle);
+            ball.dy = -speed * Math.cos(angle);
+        }
 
         // ブロックとの衝突処理
         blocks.forEach((block) => {
