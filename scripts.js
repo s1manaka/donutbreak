@@ -249,19 +249,31 @@ function updateGame() {
         // 壁との衝突判定（関数を呼び出し）
         handleWallCollision(ball);
 
-        // パドルとの衝突判定
-        if (
-            ball.y + ball.radius > paddle.y &&
-            ball.x > paddle.x &&
-            ball.x < paddle.x + paddle.width
-        ) {
-            const hitPosition = (ball.x - paddle.x) / paddle.width; // 0~1の範囲で衝突位置を計算
-            const angle = (hitPosition - 0.5) * Math.PI / 2; // 反射角を計算
-            const speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy); // ボール速度を一定に
+ // パドルとの衝突判定（修正）
+if (
+    ball.y + ball.radius > paddle.y && // ボールがパドルの高さに達した
+    ball.x > paddle.x - ball.radius && // ボールがパドルの左端を超えた
+    ball.x < paddle.x + paddle.width + ball.radius // ボールがパドルの右端を超えない
+) {
+    const hitPosition = (ball.x - paddle.x) / paddle.width; // 0~1の範囲で衝突位置を計算
+    const angle = (hitPosition - 0.5) * Math.PI / 2; // 反射角を計算
+    const speed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy); // ボール速度を一定に
 
-            ball.dx = speed * Math.sin(angle);
-            ball.dy = -speed * Math.cos(angle);
-        }
+    // 新しい速度成分を計算
+    ball.dx = speed * Math.sin(angle);
+    ball.dy = -speed * Math.cos(angle);
+
+        // ボールがパドルと画面端で重なる場合の修正
+    if (ball.x < ball.radius) {
+        ball.x = ball.radius; // ボールを画面内に戻す
+        ball.dx = Math.abs(ball.dx); // x方向速度を正にする
+    }
+    if (ball.x > canvas.width - ball.radius) {
+        ball.x = canvas.width - ball.radius; // ボールを画面内に戻す
+        ball.dx = -Math.abs(ball.dx); // x方向速度を負にする
+    }
+}
+
 
         // ブロックとの衝突処理
         blocks.forEach((block) => {
